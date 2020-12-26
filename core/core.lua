@@ -605,14 +605,16 @@ function Biddikus:UpdateFrame()
 
         local itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType, expacID, setID, isCraftingReagent = GetItemInfo(Biddikus.bid.item)
         frame.itemcontainer.text:SetText(itemName)
-        r, g, b = GetItemQualityColor(itemQuality)
-        frame.itemcontainer.text:SetTextColor(r, g, b, 1)
+        if itemQuality then
+            r, g, b = GetItemQualityColor(itemQuality)
+            frame.itemcontainer.text:SetTextColor(r, g, b, 1)
+        end
         frame.itemcontainer.item.texture:SetAllPoints()
         frame.itemcontainer.item.texture:SetTexture(itemTexture)
 
         if Biddikus.bid.currentBid then
             bidField = frame.bidbox:GetNumber()
-            if bidField <= Biddikus.bid.currentBid then
+            if bidField == Biddikus.bid.currentBid then
                 frame.bidbox:SetNumber(Biddikus.bid.currentBid + C.bidIncrement)
             end
         else
@@ -623,6 +625,13 @@ function Biddikus:UpdateFrame()
             frame.bidbutton:SetEnabled(true)
         else
             frame.bidbutton:SetEnabled(false)
+        end
+
+        -- If you are winning, disable button
+        if Biddikus.bid.currentPlayer == (C.nickname and C.nickname or self.playerName) then
+            frame.bidbutton:SetEnabled(false)
+        else
+            frame.bidbutton:SetEnabled(true)
         end
     end
 
@@ -1148,10 +1157,14 @@ function Biddikus:EndBid(player, class, amount)
         self.bid.timerCount = nil
         if self.bid.currentPlayer then
             self.frame.history:AddMessage("Sold! Congratulations " .. player .. ".")
-            SendChatMessage("[Biddikus] " .. self.bid.item .. " sold to " .. player .. " for " .. amount .."dkp.  Congratulations!", "RAID")
+            if self:CheckIfMasterLooter() then
+                SendChatMessage("[Biddikus] " .. self.bid.item .. " sold to " .. player .. " for " .. amount .."dkp.  Congratulations!", "RAID")
+            end
         else
             self.frame.history:AddMessage(self.bid.item .. " is unwanted.  So sad..")
-            SendChatMessage("[Biddikus] " .. self.bid.item .. " has rotted.", "RAID")
+            if self:CheckIfMasterLooter() then
+                SendChatMessage("[Biddikus] " .. self.bid.item .. " has rotted.", "RAID")
+            end
         end
     end
     self:UpdateFrame()

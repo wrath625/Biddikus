@@ -617,8 +617,6 @@ function Biddikus:UpdateFrame()
             if bidField == Biddikus.bid.currentBid then
                 frame.bidbox:SetNumber(Biddikus.bid.currentBid + C.bidIncrement)
             end
-        else
-            frame.bidbox:SetNumber(Biddikus.bid.minimum)
         end
 
         if Biddikus.bid.state == "OPEN" then
@@ -630,8 +628,6 @@ function Biddikus:UpdateFrame()
         -- If you are winning, disable button
         if Biddikus.bid.currentPlayer == (C.nickname and C.nickname or self.playerName) then
             frame.bidbutton:SetEnabled(false)
-        else
-            frame.bidbutton:SetEnabled(true)
         end
     end
 
@@ -1143,7 +1139,9 @@ function Biddikus:SetupBid(item, minimum)
             currentClass = nil,
         }
         self.frame.history:Clear()
-
+        if Biddikus.frame.bidbox:GetNumber() < self.bid.minimum then
+            Biddikus.frame.bidbox:SetNumber(self.bid.minimum)
+        end
     end
 end
 
@@ -1173,6 +1171,7 @@ end
 function Biddikus:PauseBid()
     if self.bid.state == "OPEN" then
         self.bid.state = "PAUSED"
+        self.frame.history:AddMessage("Pausing bidding...")
         self:CancelTimer(self.bid.timer)
     end
 end
@@ -1180,6 +1179,7 @@ end
 function Biddikus:UnpauseBid()
     if self.bid.state == "PAUSED" then
         self.bid.state = "OPEN"
+        self.frame.history:AddMessage("Resuming bidding...")
         self.bid.timer = self:ScheduleRepeatingTimer("CountdownTracker", 1)
     end
 end
@@ -1271,4 +1271,3 @@ hooksecurefunc("ContainerFrameItemButton_OnModifiedClick",function(self,button)
     Biddikus.item = item
     Biddikus:UpdateFrame()
 end);
-

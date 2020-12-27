@@ -809,6 +809,7 @@ function Biddikus:SetupFrame()
         if amount > 0 then
             Biddikus:SendBid(Biddikus.frame.bidbox:GetNumber())
         end
+        Biddikus.frame.bidbox:ClearFocus()
     end)
     
     CreateBackdrop(self.frame.bidbutton, C.backdrop)
@@ -1095,12 +1096,20 @@ end
 
 function Biddikus:SetBidAmount()
     if Biddikus.bid.currentBid then
-        bidField = frame.bidbox:GetNumber()
-        if bidField == Biddikus.bid.currentBid then
-            frame.bidbox:SetNumber(Biddikus.bid.currentBid + C.bidIncrement)
+        if not self.frame.bidbox:HasFocus() then
+            typedBid = self.frame.bidbox:GetNumber()
+            if typedBid <= Biddikus.bid.currentBid then
+                self.frame.bidbox:SetNumber(Biddikus.bid.currentBid + C.bidIncrement)
+            end
+        end
+    else 
+        if not self.frame.bidbox:HasFocus() then
+            typedBid = self.frame.bidbox:GetNumber()
+            if typedBid <= self.bid.minimum then
+                self.frame.bidbox:SetNumber(self.bid.minimum)
+            end
         end
     end
-
 end
 
 function Biddikus:ProcessBid(player, class, amount)

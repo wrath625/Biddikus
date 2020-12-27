@@ -612,7 +612,7 @@ function Biddikus:UpdateFrame()
         frame.itemcontainer.item.texture:SetAllPoints()
         frame.itemcontainer.item.texture:SetTexture(itemTexture)
 
-        self:SetBidAmount()
+        Biddikus:SetBidAmount()
 
         if Biddikus.bid.state == "OPEN" then
             frame.bidbutton:SetEnabled(true)
@@ -1096,17 +1096,17 @@ end
 
 function Biddikus:SetBidAmount()
     if Biddikus.bid.currentBid then
-        if not self.frame.bidbox:HasFocus() then
-            typedBid = self.frame.bidbox:GetNumber()
+        if not Biddikus.frame.bidbox:HasFocus() then
+            typedBid = Biddikus.frame.bidbox:GetNumber()
             if typedBid <= Biddikus.bid.currentBid then
-                self.frame.bidbox:SetNumber(Biddikus.bid.currentBid + C.bidIncrement)
+                Biddikus.frame.bidbox:SetNumber(Biddikus.bid.currentBid + C.bidIncrement)
             end
         end
     else 
-        if not self.frame.bidbox:HasFocus() then
-            typedBid = self.frame.bidbox:GetNumber()
-            if typedBid <= self.bid.minimum then
-                self.frame.bidbox:SetNumber(self.bid.minimum)
+        if not Biddikus.frame.bidbox:HasFocus() then
+            typedBid = Biddikus.frame.bidbox:GetNumber()
+            if typedBid <= Biddikus.bid.minimum then
+                Biddikus.frame.bidbox:SetNumber(Biddikus.bid.minimum)
             end
         end
     end
@@ -1170,7 +1170,7 @@ function Biddikus:EndBid(player, class, amount)
         self.bid.currentClass = class
         self:CancelTimer(self.bid.timer)
         self.bid.timerCount = nil
-        self.frame.bidbox:SetText("")
+        Biddikus.frame.bidbox:SetText("")
         if self.bid.currentPlayer then
             self.frame.history:AddMessage("Sold! Congratulations " .. player .. ".")
             if self:CheckIfMasterLooter() then

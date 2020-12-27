@@ -612,12 +612,7 @@ function Biddikus:UpdateFrame()
         frame.itemcontainer.item.texture:SetAllPoints()
         frame.itemcontainer.item.texture:SetTexture(itemTexture)
 
-        if Biddikus.bid.currentBid then
-            bidField = frame.bidbox:GetNumber()
-            if bidField == Biddikus.bid.currentBid then
-                frame.bidbox:SetNumber(Biddikus.bid.currentBid + C.bidIncrement)
-            end
-        end
+        self:SetBidAmount()
 
         if Biddikus.bid.state == "OPEN" then
             frame.bidbutton:SetEnabled(true)
@@ -1010,6 +1005,8 @@ function Biddikus:SendBid(amount)
                 bidAmount = amount,
             }
             self:SendComm(payload)
+        else
+            self:SetBidAmount()
         end
     end
 end
@@ -1096,6 +1093,16 @@ end
 -- Functions
 -----------------------------
 
+function Biddikus:SetBidAmount()
+    if Biddikus.bid.currentBid then
+        bidField = frame.bidbox:GetNumber()
+        if bidField == Biddikus.bid.currentBid then
+            frame.bidbox:SetNumber(Biddikus.bid.currentBid + C.bidIncrement)
+        end
+    end
+
+end
+
 function Biddikus:ProcessBid(player, class, amount)
     if self:ValidateBid(amount) then
         r, g, b = GetClassColor(class)
@@ -1107,6 +1114,7 @@ function Biddikus:ProcessBid(player, class, amount)
         if self.bid.timerCount > C.bidTimeout then
             self.bid.timerCount = C.bidTimeout
         end
+        self:SetBidAmount()
     end
 end
 
@@ -1153,6 +1161,7 @@ function Biddikus:EndBid(player, class, amount)
         self.bid.currentClass = class
         self:CancelTimer(self.bid.timer)
         self.bid.timerCount = nil
+        self.frame.bidbox:SetText("")
         if self.bid.currentPlayer then
             self.frame.history:AddMessage("Sold! Congratulations " .. player .. ".")
             if self:CheckIfMasterLooter() then
@@ -1208,13 +1217,14 @@ end
 function Biddikus:CountdownTracker()
     if self.bid.timerCount then
         self.bid.timerCount = self.bid.timerCount - 1
-    end
-    if self.bid.timerCount < 6 and self.bid.timerCount > 0 then
-        self.frame.history:AddMessage(self.bid.timerCount, 1, 0, 0)
-        if C.flash then
-            self:FlashScreen()
+
+        if self.bid.timerCount < 6 and self.bid.timerCount > 0 then
+            self.frame.history:AddMessage(self.bid.timerCount, 1, 0, 0)
+            if C.flash then
+                self:FlashScreen()
+            end
         end
-    end
+    end 
 
     if self.bid.timerCount == 0 then
         if self:CheckIfMasterLooter() then

@@ -626,6 +626,11 @@ function Biddikus:UpdateFrame()
         end
     end
 
+    -- force clear bid box
+    if Biddikus.bid.state == "CLOSED" then
+        frame.bidbox:SetText("")
+    end
+
 	-- Header
 	if C.frame.headerShow then
         frame.header:SetSize(C.frame.width + 2, C.bar.height)
@@ -678,6 +683,13 @@ function Biddikus:UpdateFrame()
             r, g, b = GetItemQualityColor(itemQual)
             frame.footer.text:SetTextColor(r, g, b, 1)
         end
+
+        if Biddikus.bid.state == "OPEN" then
+            frame.footer.startbutton:SetEnabled(false)
+        else
+            frame.footer.startbutton:SetEnabled(true)
+        end
+            
 
         frame.footer:Show()
     else
@@ -1169,8 +1181,7 @@ function Biddikus:EndBid(player, class, amount)
         self.bid.currentPlayer = player
         self.bid.currentClass = class
         self:CancelTimer(self.bid.timer)
-        self.bid.timerCount = nil
-        Biddikus.frame.bidbox:SetText("")
+        self.bid.timerCount = nil        
         if self.bid.currentPlayer then
             self.frame.history:AddMessage("Sold! Congratulations " .. player .. ".")
             if self:CheckIfMasterLooter() then
@@ -1183,6 +1194,7 @@ function Biddikus:EndBid(player, class, amount)
             end
         end
     end
+    self.frame.bidbox:SetText("")
     self:UpdateFrame()
 end
 

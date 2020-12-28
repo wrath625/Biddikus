@@ -1,6 +1,6 @@
 local Biddikus, C, L, _ = unpack(select(2, ...))
 
-Biddikus = LibStub("AceAddon-3.0"):NewAddon("Bid", "AceConsole-3.0", "AceEvent-3.0", "AceComm-3.0", "AceSerializer-3.0", "AceHook-3.0", "AceTimer-3.0")
+Biddikus = LibStub("AceAddon-3.0"):NewAddon("Biddikus", "AceConsole-3.0", "AceEvent-3.0", "AceComm-3.0", "AceSerializer-3.0", "AceHook-3.0", "AceTimer-3.0")
 local AceGUI = LibStub("AceGUI-3.0")
 
 local screenWidth			= floor(GetScreenWidth())

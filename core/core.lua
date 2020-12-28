@@ -60,6 +60,7 @@ Biddikus.bid = {
     state = nil,
     timer = nil,
     timerCount = nil,
+    timerMax = nil,
     currentBid = nil,
     currentPlayer = nil,
     currentClass = nil,
@@ -125,7 +126,19 @@ Biddikus.options = {
                     desc = "Enable bid timeout screen flash",
                     get = function(info) return(Biddikus.db.profile.flash) end,
                     set = function(info, key) Biddikus.db.profile.flash=key end
-                }
+                },
+                autohide = {
+                    order = 6, 
+                    type = "toggle",
+                    name = "Auto Hide",
+                    desc = "Hides Biddikus when not bidding",
+                    get = function(info) 
+                        Biddikus:UpdateFrame()
+                        return(Biddikus.db.profile.autohide) 
+                    end,
+                    set = function(info, key) Biddikus.db.profile.autohide=key end
+                },
+
             }
         },
         appearance = {
@@ -360,18 +373,48 @@ Biddikus.options = {
 					end,
 				},
             },
+        },
+        masterlooter = {
+            order = 3,
+            type = "group",
+            name = "Masterlooter",
+			args = {
+                bidTimeout = {
+                    order = 1, 
+                    type = "range",
+                    min = 15,
+                    max = 180,
+                    step = 1,
+                    name = "Bid Timeout",
+                    desc = "Set the starting and maximum time on a bid timer",
+                    get = function(info) return(Biddikus.db.profile.bidTimeout) end,
+                    set = function(info, key) Biddikus.db.profile.bidTimeout=key end
+                },
+                bidMinimum = {
+                    order = 2, 
+                    type = "input",
+                    name = "Minimum Bid",
+                    desc = "Set the starting bid value",
+                    get = function(info) 
+                        Biddikus:UpdateFrame()
+                        return(Biddikus.db.profile.bidMinimum)
+                    end,
+                    set = function(info, key) Biddikus.db.profile.bidMinimum=key end
+                }
+            }
         }
 	}
 }
 Biddikus.defaultOptions = {
 	profile = {
-        welcome = true,
         enable = true,
         bidIncrement = 5,
         bidTimeout = 30,
+        bidMinimum = 1,
         nickname = nil,
         sound = true,
         flash = false,
+        autohide = false,
         frame = {
             scale				= 1,									-- global scale
             width				= 217,									-- frame width
@@ -564,9 +607,10 @@ function Biddikus:UpdateFrame()
 	frame.bg:SetAllPoints()
     frame.bg:SetVertexColor(unpack(C.frame.color))
     
-    frame.header.logo:SetSize(C.bar.height - 2, C.bar.height - 2)
+    
     frame.itemcontainer:SetSize(C.frame.width, C.bar.height)
     frame.itemcontainer.item:SetSize(C.bar.height - 3, C.bar.height - 3)
+    frame.itemcontainer.text:SetSize(C.frame.width - 3 - C.bar.height, C.bar.height - 3)
     frame.itemcontainer.timer:SetSize(C.frame.width - 3, C.bar.height - 3)
     frame.history:SetSize(C.frame.width - 6, C.frame.height - C.bar.height - (C.bar.height + 6))
     local bidcontainerOffset = 0
@@ -581,7 +625,7 @@ function Biddikus:UpdateFrame()
 
     frame.header.text:SetPoint("LEFT", frame.header, C.bar.height + 2, -1)
     frame.history:SetPoint("TOPLEFT", frame, "TOPLEFT", 3, -C.bar.height)
-    frame.itemcontainer.text:SetPoint("LEFT", frame.itemcontainer, C.bar.height + 3, 0)
+    frame.itemcontainer.text:SetPoint("LEFT", frame.itemcontainer, C.bar.height + 3, -1)
     frame.itemcontainer.timer:SetPoint("RIGHT", frame.itemcontainer, 0, -1)
 
     frame.history:SetFont(LSM:Fetch("font", C.font.name), C.font.size -2, C.font.style)
@@ -632,14 +676,17 @@ function Biddikus:UpdateFrame()
     end
 
 	-- Header
-	if C.frame.headerShow then
+    if C.frame.headerShow then
+        frame.header.logo:SetSize(C.bar.height - 2, C.bar.height - 2)
+        frame.header.text:SetSize(C.frame.width, C.bar.height)
         frame.header:SetSize(C.frame.width + 2, C.bar.height)
 
-		frame.header:SetPoint("TOPLEFT", frame, 0, C.bar.height - 1)
+        frame.header:SetPoint("TOPLEFT", frame, 0, C.bar.height - 1)
+        frame.header.text:SetPoint("LEFT", self.frame.header, C.bar.height + 2, -1)
 	    frame.header.bg:SetAllPoints()
 	    frame.header.bg:SetVertexColor(unpack(C.frame.headerColor))
 
-		frame.header.text:SetText("Biddikus")
+        frame.header.text:SetText("Biddikus")
 
 		UpdateFont(frame.header.text, 0)
 
@@ -649,13 +696,13 @@ function Biddikus:UpdateFrame()
     end
 
     -- Footer
+    frame.footer:Hide()
     if self:CheckIfMasterLooter() then
         frame.footer:SetSize(C.frame.width + 2, C.bar.height*2 + 9)
 
 		frame.footer:SetPoint("BOTTOMLEFT", frame, 0, -C.bar.height*2 - 9)
 	    frame.footer.bg:SetAllPoints()
         frame.footer.bg:SetVertexColor(unpack(C.frame.color))
-        
 
         frame.footer.text:SetSize(C.frame.width * 2/4 -3, C.bar.height)
         frame.footer.minbox:SetSize(C.frame.width * 1/4 -3, C.bar.height)
@@ -677,6 +724,8 @@ function Biddikus:UpdateFrame()
         frame.footer.endbutton:SetPoint("BOTTOMRIGHT", frame.footer, "BOTTOMRIGHT", -(C.frame.width * 1/4 + 3), 3)
         frame.footer.clearbutton:SetPoint("BOTTOMRIGHT", frame.footer, "BOTTOMRIGHT", -3, 3)
 
+        frame.footer.minbox:SetNumber(C.bidMinimum)
+
         if Biddikus.item then
             local itemName, itemLink, itemQual = GetItemInfo(Biddikus.item)
             frame.footer.text:SetText(itemName)
@@ -689,11 +738,26 @@ function Biddikus:UpdateFrame()
         else
             frame.footer.startbutton:SetEnabled(true)
         end
-            
 
         frame.footer:Show()
     else
         frame.footer:Hide()
+    end
+
+    if C.autohide and not Biddikus.bid.item then
+        frame:SetSize(C.frame.width + 2, 1)
+        if not Biddikus:CheckIfMasterLooter() then
+            frame.header:Hide()
+        end
+        frame.bidcontainer:Hide()
+        frame.itemcontainer:Hide()
+        frame.bg:SetVertexColor(0, 0, 0, 0)
+    else
+        frame:SetSize(C.frame.width + 2, C.frame.height)
+        frame.header:Show()
+        frame.bidcontainer:Show()
+        frame.itemcontainer:Show()
+        frame.bg:SetVertexColor(unpack(C.frame.color))
     end
 
     if C.enable then
@@ -759,7 +823,6 @@ function Biddikus:SetupFrame()
 	self.frame.header:EnableMouse(true)
 
 	self.frame.header.text = CreateFS(self.frame.header)
-	self.frame.header.text:SetPoint("LEFT", self.frame.header, C.bar.height + 2, -1)
     self.frame.header.text:SetJustifyH("LEFT")
     self.frame.header.bg = self.frame.header:CreateTexture(nil, "BACKGROUND", nil, -8)
     self.frame.header.bg:SetColorTexture(1, 1, 1, 1)
@@ -844,7 +907,7 @@ function Biddikus:SetupFrame()
     self.frame.footer.minbox:SetScript("OnEscapePressed", EditBox_ClearFocus)
     self.frame.footer.minbox:SetScript("OnEditFocusLost", EditBox_ClearHighlight)
     self.frame.footer.minbox:SetScript("OnEditFocusGained", EditBox_HighlightText)
-    self.frame.footer.minbox:SetNumber(40)
+    self.frame.footer.minbox:SetNumber(C.bidMinimum)
     CreateBackdrop(self.frame.footer.minbox, C.backdrop)
 
     self.frame.footer.startbutton = CreateFrame("Button", "StartButton", self.frame.footer)
@@ -853,7 +916,7 @@ function Biddikus:SetupFrame()
     self.frame.footer.startbutton:SetHighlightFontObject(GameFontHighlight)
     self.frame.footer.startbutton:SetNormalFontObject(GameFontNormal)
     self.frame.footer.startbutton:SetScript("OnClick", function(self, arg1)
-        Biddikus:SendStartBid(Biddikus.item, Biddikus.frame.footer.minbox:GetNumber())
+        Biddikus:SendStartBid(Biddikus.item, Biddikus.frame.footer.minbox:GetNumber(), C.bidTimeout)
     end)
     CreateBackdrop(self.frame.footer.startbutton, C.backdrop)
 
@@ -1024,12 +1087,13 @@ function Biddikus:SendBid(amount)
     end
 end
 
-function Biddikus:SendStartBid(item, minimum)
+function Biddikus:SendStartBid(item, minimum, timer)
     if self:CheckIfMasterLooter() then
         payload = {
             messageType = "START",
             item = item,
             minimum = minimum,
+            timer = timer,
         }
         self:SendComm(payload)
     end
@@ -1084,7 +1148,7 @@ function Biddikus:OnCommReceived(prefix, message, distribution, sender)
             self:ProcessBid(payload.playerName, payload.playerClass, payload.bidAmount)
         end
         if payload.messageType == "START" then
-            self:SetupBid(payload.item, payload.minimum)
+            self:SetupBid(payload.item, payload.minimum, payload.timer)
         end
         if payload.messageType == "END" then
             self:EndBid(payload.playerName, payload.playerClass, payload.bidAmount)
@@ -1132,8 +1196,8 @@ function Biddikus:ProcessBid(player, class, amount)
         self.bid.currentPlayer = player
         self.bid.currentClass = class
         self.bid.timerCount = self.bid.timerCount + 10
-        if self.bid.timerCount > C.bidTimeout then
-            self.bid.timerCount = C.bidTimeout
+        if self.bid.timerCount > self.bid.timerMax then
+            self.bid.timerCount = self.bid.timerMax
         end
         self:SetBidAmount()
     end
@@ -1154,7 +1218,7 @@ function Biddikus:ValidateBid(amount)
     return false
 end
 
-function Biddikus:SetupBid(item, minimum)
+function Biddikus:SetupBid(item, minimum, timer)
     if item then
         if C.sound then PlaySoundFile(LSM:Fetch("sound", "Priority"), "SFX") end
         self.bid = {
@@ -1162,7 +1226,8 @@ function Biddikus:SetupBid(item, minimum)
             minimum = minimum,
             state = "OPEN",
             timer = self:ScheduleRepeatingTimer("CountdownTracker", 1),
-            timerCount = 30,
+            timerCount = timer,
+            timerMax = timer,
             currentBid = nil,
             currentPlayer = nil,
             currentClass = nil,
@@ -1181,7 +1246,8 @@ function Biddikus:EndBid(player, class, amount)
         self.bid.currentPlayer = player
         self.bid.currentClass = class
         self:CancelTimer(self.bid.timer)
-        self.bid.timerCount = nil        
+        self.bid.timerCount = nil
+        self.bid.timerMax = nil
         if self.bid.currentPlayer then
             self.frame.history:AddMessage("Sold! Congratulations " .. player .. ".")
             if self:CheckIfMasterLooter() then
@@ -1221,6 +1287,7 @@ function Biddikus:ClearBid()
         state = nil,
         timer = self:CancelTimer(self.bid.timer),
         timerCount = nil,
+        timerMax = nil,
         currentBid = nil,
         currentPlayer = nil,
         currentClass = nil,

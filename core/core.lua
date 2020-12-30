@@ -111,14 +111,6 @@ Biddikus.options = {
                         end
                         Biddikus.db.profile.nickname=key end
                 },
-                sound = {
-                    order = 4,
-                    type = "toggle",
-                    name = "Enable Sound",
-                    desc = "Enable sounds",
-                    get = function(info) return(Biddikus.db.profile.sound) end,
-                    set = function(info, key) Biddikus.db.profile.sound=key end
-                },
                 flash = {
                     order = 5,
                     type = "toggle",
@@ -374,8 +366,55 @@ Biddikus.options = {
 				},
             },
         },
-        masterlooter = {
+        sound = {
             order = 3,
+            type = "group",
+            name = "Sound",
+			args = {
+                enable = {
+                    order = 1,
+                    type = "toggle",
+                    name = "Enable Sound",
+                    desc = "Enable sounds",
+                    get = function(info) return(Biddikus.db.profile.sound.enable) end,
+                    set = function(info, key) Biddikus.db.profile.sound.enable=key end
+                },
+                start = {
+                    order = 2,
+                    type = "toggle",
+                    name = "Enable Start",
+                    desc = "Enable bid start notification",
+                    get = function(info) return(Biddikus.db.profile.sound.start) end,
+                    set = function(info, key) Biddikus.db.profile.sound.start=key end
+                },
+                countdown = {
+                    order = 3,
+                    type = "toggle",
+                    name = "Enable Countdown",
+                    desc = "Enable bid timeout countdown",
+                    get = function(info) return(Biddikus.db.profile.sound.countdown) end,
+                    set = function(info, key) Biddikus.db.profile.sound.countdown=key end
+                },
+                pause = {
+                    order = 4,
+                    type = "toggle",
+                    name = "Enable Pause",
+                    desc = "Enable bid pause notification",
+                    get = function(info) return(Biddikus.db.profile.sound.pause) end,
+                    set = function(info, key) Biddikus.db.profile.sound.pause=key end
+                },
+                resume = {
+                    order = 5,
+                    type = "toggle",
+                    name = "Enable Resume",
+                    desc = "Enable bid resume notification",
+                    get = function(info) return(Biddikus.db.profile.sound.resume) end,
+                    set = function(info, key) Biddikus.db.profile.sound.resume=key end
+                }
+            }
+        },
+        masterlooter = {
+            order = 4,
             type = "group",
             name = "Masterlooter",
 			args = {
@@ -400,7 +439,26 @@ Biddikus.options = {
                         return(Biddikus.db.profile.bidMinimum)
                     end,
                     set = function(info, key) Biddikus.db.profile.bidMinimum=key end
-                }
+                },
+                postLoot = {
+                    order = 3, 
+                    type = "toggle",
+                    name = "Post Loot",
+                    desc = "Post looted items into raid chat",
+                    get = function(info) return(Biddikus.db.profile.postLoot) end,
+                    set = function(info, key) Biddikus.db.profile.postLoot=key end
+                },
+                qualityThreshold = {
+                    order = 4, 
+                    type = "range",
+                    min = 0,
+                    max = 8,
+                    step = 1,
+                    name = "Item Quality",
+                    desc = "Set the item quality threshold for posting to raid chat",
+                    get = function(info) return(Biddikus.db.profile.qualityThreshold) end,
+                    set = function(info, key) Biddikus.db.profile.qualityThreshold=key end
+                },
             }
         }
 	}
@@ -412,9 +470,17 @@ Biddikus.defaultOptions = {
         bidTimeout = 30,
         bidMinimum = 1,
         nickname = nil,
-        sound = true,
         flash = false,
         autohide = false,
+        postLoot = true,
+        qualityThreshold = 4,
+        sound = {
+            enable = true,
+            start = true,
+            countdown = true,
+            pause = true,
+            resume = true,
+        },
         frame = {
             scale				= 1,									-- global scale
             width				= 217,									-- frame width
@@ -452,7 +518,18 @@ Biddikus.defaultOptions = {
 
 local LSM = LibStub("LibSharedMedia-3.0")
 -- Register some media
-LSM:Register("sound", "Priority", [[Interface\AddOns\Biddikus\media\priority.ogg]])
+LSM:Register("sound", "Priority1", [[Interface\AddOns\Biddikus\media\sound\priority1.ogg]])
+LSM:Register("sound", "Priority2", [[Interface\AddOns\Biddikus\media\sound\priority2.ogg]])
+LSM:Register("sound", "Priority3", [[Interface\AddOns\Biddikus\media\sound\priority3.ogg]])
+LSM:Register("sound", "Priority4", [[Interface\AddOns\Biddikus\media\sound\priority4.ogg]])
+LSM:Register("sound", "Priority5", [[Interface\AddOns\Biddikus\media\sound\priority5.ogg]])
+LSM:Register("sound", "Reset", [[Interface\AddOns\Biddikus\media\sound\reset.ogg]])
+LSM:Register("sound", "Pause", [[Interface\AddOns\Biddikus\media\sound\pause.ogg]])
+LSM:Register("sound", "1", [[Interface\AddOns\Biddikus\media\sound\Kolt\1.ogg]])
+LSM:Register("sound", "2", [[Interface\AddOns\Biddikus\media\sound\Kolt\2.ogg]])
+LSM:Register("sound", "3", [[Interface\AddOns\Biddikus\media\sound\Kolt\3.ogg]])
+LSM:Register("sound", "4", [[Interface\AddOns\Biddikus\media\sound\Kolt\4.ogg]])
+LSM:Register("sound", "5", [[Interface\AddOns\Biddikus\media\sound\Kolt\5.ogg]])
 LSM:Register("font", "NotoSans SemiCondensedBold", [[Interface\AddOns\Biddikus\media\NotoSans-SemiCondensedBold.ttf]])
 LSM:Register("font", "Standard Text Font", _G.STANDARD_TEXT_FONT) -- register so it's usable as a default in config
 LSM:Register("statusbar", "Biddikus Default", [[Interface\ChatFrame\ChatFrameBackground]]) -- register so it's usable as a default in config
@@ -1021,6 +1098,8 @@ function Biddikus:PLAYER_LOGIN()
 
     C = self.db.profile
 
+    self.playerName = UnitName("player")
+
     self:SetupFrame()
 	self:SetupMenu()
 
@@ -1035,7 +1114,6 @@ function Biddikus:PLAYER_LOGIN()
 
     self:UnregisterEvent("PLAYER_LOGIN")
     self.PLAYER_LOGIN = nil
-    self.playerName = UnitName("player")
 end
 
 function Biddikus:LOOT_OPENED()
@@ -1054,6 +1132,8 @@ function Biddikus:GROUP_ROSTER_UPDATE()
             lootMethod, masterLooterPartyID, masterLooterRaidID = GetLootMethod()
             if lootMethod == "master" then
                 self.masterLooterName = GetRaidRosterInfo(masterLooterRaidID);
+            else 
+                self.masterLooterName = nil
             end
         else
             self.masterLooterName = nil
@@ -1220,7 +1300,7 @@ end
 
 function Biddikus:SetupBid(item, minimum, timer)
     if item then
-        if C.sound then PlaySoundFile(LSM:Fetch("sound", "Priority"), "SFX") end
+        if C.sound.enable and C.sound.start then PlaySoundFile(LSM:Fetch("sound", "Priority" .. math.random(1,5)), "SFX") end
         self.bid = {
             item = item,
             minimum = minimum,
@@ -1266,6 +1346,7 @@ end
 
 function Biddikus:PauseBid()
     if self.bid.state == "OPEN" then
+        if C.sound.enable and C.sound.pause then PlaySoundFile(LSM:Fetch("sound", "Pause"), "SFX") end
         self.bid.state = "PAUSED"
         self.frame.history:AddMessage("Pausing bidding...")
         self:CancelTimer(self.bid.timer)
@@ -1274,6 +1355,7 @@ end
 
 function Biddikus:UnpauseBid()
     if self.bid.state == "PAUSED" then
+        if C.sound.enable and C.sound.resume then PlaySoundFile(LSM:Fetch("sound", "Reset"), "SFX") end
         self.bid.state = "OPEN"
         self.frame.history:AddMessage("Resuming bidding...")
         self.bid.timer = self:ScheduleRepeatingTimer("CountdownTracker", 1)
@@ -1307,6 +1389,7 @@ function Biddikus:CountdownTracker()
         self.bid.timerCount = self.bid.timerCount - 1
 
         if self.bid.timerCount < 6 and self.bid.timerCount > 0 then
+            if C.sound.enable and C.sound.countdown then PlaySoundFile(LSM:Fetch("sound", tostring(self.bid.timerCount)), "SFX") end
             self.frame.history:AddMessage(self.bid.timerCount, 1, 0, 0)
             if C.flash then
                 self:FlashScreen()
@@ -1337,25 +1420,28 @@ end
 -- Check Rarity
 -- Checks if Epic or Legendary
 function Biddikus:CheckRarity(item)
-	local itemId = string.match(item, "item:(%d+)")
-	local itemName, itemLink, itemQual = GetItemInfo(itemId)
-	if (itemQual==4 or itemQual==5) then
-		return true
-	end
-	return false
+    if item then
+        local itemName, itemLink, itemQual = GetItemInfo(item)
+        if (itemQual >= C.qualityThreshold) then
+            return true
+        end
+    end
+    return false
 end
 
 -- LIST_LOOT
 -- This iterates through the items in an open loot window and lists them in raid chat
 -- may change this to list items in window
 function Biddikus:ListLoot()
-    for i=1, GetNumLootItems() do
-        local itemLink=GetLootSlotLink(i)
-        --if self:CheckRarity(itemLink) then
-            i = i + 1
-            SendChatMessage("[Biddikus] " .. itemLink, "RAID")
-		--end
-	end
+    if C.postLoot then
+        for i=1, GetNumLootItems() do
+            local itemLink=GetLootSlotLink(i)
+            if self:CheckRarity(itemLink) then
+                i = i + 1
+                SendChatMessage("[Biddikus] " .. itemLink, "RAID")
+            end
+        end
+    end
 end
 
 function Biddikus:ChatCommand()

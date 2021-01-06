@@ -119,8 +119,30 @@ Biddikus.options = {
                     get = function(info) return(Biddikus.db.profile.flash) end,
                     set = function(info, key) Biddikus.db.profile.flash=key end
                 },
-                autohide = {
+                raidWarningStart = {
                     order = 6, 
+                    type = "toggle",
+                    name = "Enable Bid Start Warning",
+                    desc = "Warns you about bid start with a raid warning message",
+                    get = function(info) 
+                        Biddikus:UpdateFrame()
+                        return(Biddikus.db.profile.raidWarningStart) 
+                    end,
+                    set = function(info, key) Biddikus.db.profile.raidWarningStart=key end
+                },
+                raidWarningEnd = {
+                    order = 7, 
+                    type = "toggle",
+                    name = "Enable Bid End Warnings",
+                    desc = "Warns you about bids timing out",
+                    get = function(info) 
+                        Biddikus:UpdateFrame()
+                        return(Biddikus.db.profile.raidWarningEnd) 
+                    end,
+                    set = function(info, key) Biddikus.db.profile.raidWarningEnd=key end
+                },
+                autohide = {
+                    order = 8, 
                     type = "toggle",
                     name = "Auto Hide",
                     desc = "Hides Biddikus when not bidding",
@@ -410,6 +432,14 @@ Biddikus.options = {
                     desc = "Enable bid resume notification",
                     get = function(info) return(Biddikus.db.profile.sound.resume) end,
                     set = function(info, key) Biddikus.db.profile.sound.resume=key end
+                },
+                raidWarningSound = {
+                    order = 6,
+                    type = "toggle",
+                    name = "Enable Raid Warning",
+                    desc = "Enable Raid Warning sound",
+                    get = function(info) return(Biddikus.db.profile.sound.raidWarningSound) end,
+                    set = function(info, key) Biddikus.db.profile.sound.raidWarningSound=key end
                 }
             }
         },
@@ -471,6 +501,8 @@ Biddikus.defaultOptions = {
         bidMinimum = 1,
         nickname = nil,
         flash = false,
+        raidWarningStart = false,
+        raidWarningEnd = false,
         autohide = false,
         postLoot = true,
         qualityThreshold = 4,
@@ -480,6 +512,7 @@ Biddikus.defaultOptions = {
             countdown = true,
             pause = true,
             resume = true,
+            raidWarningSound = false,
         },
         frame = {
             scale				= 1,									-- global scale
@@ -1176,6 +1209,7 @@ function Biddikus:SendStartBid(item, minimum, timer)
             timer = timer,
         }
         self:SendComm(payload)
+        SendChatMessage("[Biddikus] bid for " .. item .. " starting!", "RAID")
     end
 end
 
@@ -1300,7 +1334,13 @@ end
 
 function Biddikus:SetupBid(item, minimum, timer)
     if item then
-        if C.sound.enable and C.sound.start then PlaySoundFile(LSM:Fetch("sound", "Priority" .. math.random(1,5)), "SFX") end
+        if C.sound.enable and C.sound.start then PlaySoundFile(LSM:Fetch("sound", "Priority" .. math.random(1,5)), "Master") end
+        if C.raidWarningStart then
+            RaidNotice_AddMessage(RaidWarningFrame, "[Biddikus] " .. item .. " starting!", ChatTypeInfo["RAID_WARNING"]);
+        end
+        if C.sound.raidWarningSound then
+            PlaySound(8959, "Master");
+        end        
         self.bid = {
             item = item,
             minimum = minimum,
@@ -1346,7 +1386,7 @@ end
 
 function Biddikus:PauseBid()
     if self.bid.state == "OPEN" then
-        if C.sound.enable and C.sound.pause then PlaySoundFile(LSM:Fetch("sound", "Pause"), "SFX") end
+        if C.sound.enable and C.sound.pause then PlaySoundFile(LSM:Fetch("sound", "Pause"), "Master") end
         self.bid.state = "PAUSED"
         self.frame.history:AddMessage("Pausing bidding...")
         self:CancelTimer(self.bid.timer)
@@ -1355,7 +1395,7 @@ end
 
 function Biddikus:UnpauseBid()
     if self.bid.state == "PAUSED" then
-        if C.sound.enable and C.sound.resume then PlaySoundFile(LSM:Fetch("sound", "Reset"), "SFX") end
+        if C.sound.enable and C.sound.resume then PlaySoundFile(LSM:Fetch("sound", "Reset"), "Master") end
         self.bid.state = "OPEN"
         self.frame.history:AddMessage("Resuming bidding...")
         self.bid.timer = self:ScheduleRepeatingTimer("CountdownTracker", 1)
@@ -1389,7 +1429,13 @@ function Biddikus:CountdownTracker()
         self.bid.timerCount = self.bid.timerCount - 1
 
         if self.bid.timerCount < 6 and self.bid.timerCount > 0 then
-            if C.sound.enable and C.sound.countdown then PlaySoundFile(LSM:Fetch("sound", tostring(self.bid.timerCount)), "SFX") end
+            if C.sound.enable and C.sound.countdown then PlaySoundFile(LSM:Fetch("sound", tostring(self.bid.timerCount)), "Master") end
+            if C.raidWarningEnd then
+                RaidNotice_AddMessage(RaidWarningFrame, "[Biddikus] Ending in " .. tostring(self.bid.timerCount) .. "!", ChatTypeInfo["RAID_WARNING"]);
+            end
+            if C.sound.raidWarningSound then
+                PlaySound(8959, "Master");
+            end
             self.frame.history:AddMessage(self.bid.timerCount, 1, 0, 0)
             if C.flash then
                 self:FlashScreen()

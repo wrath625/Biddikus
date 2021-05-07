@@ -1189,7 +1189,8 @@ function Biddikus:SendBid(amount)
             localized, englishClass = UnitClass(self.playerName)
             payload = {
                 messageType = "BID",
-                playerName = C.nickname and C.nickname or self.playerName,
+                playerName = self.playerName,
+                playerNick = C.nickname and C.nickname or self.playerName, 
                 playerClass = englishClass,
                 bidAmount = amount,
             }
@@ -1218,6 +1219,7 @@ function Biddikus:SendEndBid()
         payload = {
             messageType = "END",
             playerName = self.bid.currentPlayer,
+            playerNick = self.bid.currentPlayerNick,
             playerClass = self.bid.currentClass,
             bidAmount = self.bid.currentBid
         }
@@ -1259,13 +1261,13 @@ function Biddikus:OnCommReceived(prefix, message, distribution, sender)
             return
         end
         if payload.messageType == "BID" then
-            self:ProcessBid(payload.playerName, payload.playerClass, payload.bidAmount)
+            self:ProcessBid(payload.playerName, payload.playerNick, payload.playerClass, payload.bidAmount)
         end
         if payload.messageType == "START" then
             self:SetupBid(payload.item, payload.minimum, payload.timer)
         end
         if payload.messageType == "END" then
-            self:EndBid(payload.playerName, payload.playerClass, payload.bidAmount)
+            self:EndBid(payload.playerName, payload.playerNick, payload.playerClass, payload.bidAmount)
         end
         if payload.messageType == "PAUSE" then
             self:PauseBid()
@@ -1302,12 +1304,13 @@ function Biddikus:SetBidAmount()
     end
 end
 
-function Biddikus:ProcessBid(player, class, amount)
+function Biddikus:ProcessBid(player, playerNick, class, amount)
     if self:ValidateBid(amount) then
         r, g, b = GetClassColor(class)
-        self.frame.history:AddMessage(amount .. " - " .. player, r, g, b)
+        self.frame.history:AddMessage(amount .. " - " .. playerNick, r, g, b)
         self.bid.currentBid = amount
         self.bid.currentPlayer = player
+        self.bid.currentPlayerNick = playerNick
         self.bid.currentClass = class
         self.bid.timerCount = self.bid.timerCount + 10
         if self.bid.timerCount > self.bid.timerMax then
@@ -1359,17 +1362,18 @@ function Biddikus:SetupBid(item, minimum, timer)
     end
 end
 
-function Biddikus:EndBid(player, class, amount)
+function Biddikus:EndBid(player, playerNick, class, amount)
     if self.bid.state then
         self.bid.state = "CLOSED"
         self.bid.currentBid = amount
         self.bid.currentPlayer = player
+        self.bid.currentPlayerNick = playerNick
         self.bid.currentClass = class
         self:CancelTimer(self.bid.timer)
         self.bid.timerCount = nil
         self.bid.timerMax = nil
         if self.bid.currentPlayer then
-            self.frame.history:AddMessage("Sold! Congratulations " .. player .. ".")
+            self.frame.history:AddMessage("Sold! Congratulations " .. playerNick .. ".")
             if self:CheckIfMasterLooter() then
                 SendChatMessage("[Biddikus] " .. self.bid.item .. " sold to " .. player .. " for " .. amount .."dkp.  Congratulations!", "RAID")
             end

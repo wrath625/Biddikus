@@ -878,7 +878,7 @@ function Biddikus:UpdateFrame()
 end
 
 local function CreateBackdrop(parent, cfg)
-	local f = CreateFrame("Frame", nil, parent)
+	local f = CreateFrame("Frame", nil, parent, BackdropTemplateMixin and "BackdropTemplate")
 	f:SetPoint("TOPLEFT", parent, "TOPLEFT", -cfg.inset, cfg.inset)
 	f:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", cfg.inset, -cfg.inset)
 	-- Backdrop Settings

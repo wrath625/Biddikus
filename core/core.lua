@@ -91,9 +91,9 @@ Biddikus.options = {
                 increment = {
                     order = 2, 
                     type = "range",
-                    min = 1,
+                    min = 0.1,
                     max = 100,
-                    step = 1,
+                    step = 0.1,
                     name = "Automatic Bid Increment",
                     desc = "Auto increment your next bid by this amount",
                     get = function(info) return(Biddikus.db.profile.bidIncrement) end,
@@ -834,7 +834,7 @@ function Biddikus:UpdateFrame()
         frame.footer.endbutton:SetPoint("BOTTOMRIGHT", frame.footer, "BOTTOMRIGHT", -(C.frame.width * 1/4 + 3), 3)
         frame.footer.clearbutton:SetPoint("BOTTOMRIGHT", frame.footer, "BOTTOMRIGHT", -3, 3)
 
-        frame.footer.minbox:SetNumber(C.bidMinimum)
+        frame.footer.minbox:SetNumber(string.format("%.2f", C.bidMinimum))
 
         if Biddikus.item then
             local itemName, itemLink, itemQual = GetItemInfo(Biddikus.item)
@@ -972,10 +972,9 @@ function Biddikus:SetupFrame()
 
     self.frame.bidbox = CreateFrame("EditBox", "BidBox", self.frame.bidcontainer)
     self.frame.bidbox:SetPoint("LEFT", self.frame.bidcontainer, "LEFT", 3, 3)
-    self.frame.bidbox:SetMovable(false);
-    self.frame.bidbox:SetAutoFocus(false);
+    self.frame.bidbox:SetMovable(false)
+    self.frame.bidbox:SetAutoFocus(false)
     self.frame.bidbox:SetMultiLine(false)
-    self.frame.bidbox:SetNumeric(true)
     self.frame.bidbox:SetScript("OnEnterPressed", EditBox_ClearFocus)
     self.frame.bidbox:SetScript("OnEscapePressed", EditBox_ClearFocus)
     self.frame.bidbox:SetScript("OnEditFocusLost", EditBox_ClearHighlight)
@@ -1009,15 +1008,14 @@ function Biddikus:SetupFrame()
     self.frame.footer.text:SetJustifyH("LEFT")
 
     self.frame.footer.minbox = CreateFrame("EditBox", "MinBox", self.frame.footer)
-    self.frame.footer.minbox:SetMovable(false);
-    self.frame.footer.minbox:SetAutoFocus(false);
+    self.frame.footer.minbox:SetMovable(false)
+    self.frame.footer.minbox:SetAutoFocus(false)
     self.frame.footer.minbox:SetMultiLine(false)
-    self.frame.footer.minbox:SetNumeric(true)
     self.frame.footer.minbox:SetScript("OnEnterPressed", EditBox_ClearFocus)
     self.frame.footer.minbox:SetScript("OnEscapePressed", EditBox_ClearFocus)
     self.frame.footer.minbox:SetScript("OnEditFocusLost", EditBox_ClearHighlight)
     self.frame.footer.minbox:SetScript("OnEditFocusGained", EditBox_HighlightText)
-    self.frame.footer.minbox:SetNumber(C.bidMinimum)
+    self.frame.footer.minbox:SetNumber(string.format("%.2f", C.bidMinimum))
     CreateBackdrop(self.frame.footer.minbox, C.backdrop)
 
     self.frame.footer.startbutton = CreateFrame("Button", "StartButton", self.frame.footer)
@@ -1291,14 +1289,14 @@ function Biddikus:SetBidAmount()
         if not Biddikus.frame.bidbox:HasFocus() then
             typedBid = Biddikus.frame.bidbox:GetNumber()
             if typedBid <= Biddikus.bid.currentBid then
-                Biddikus.frame.bidbox:SetNumber(Biddikus.bid.currentBid + C.bidIncrement)
+                Biddikus.frame.bidbox:SetNumber(string.format("%.2f", Biddikus.bid.currentBid + C.bidIncrement))
             end
         end
     else 
         if not Biddikus.frame.bidbox:HasFocus() then
             typedBid = Biddikus.frame.bidbox:GetNumber()
             if typedBid <= Biddikus.bid.minimum then
-                Biddikus.frame.bidbox:SetNumber(Biddikus.bid.minimum)
+                Biddikus.frame.bidbox:SetNumber(string.format("%.2f", Biddikus.bid.minimum))
             end
         end
     end
@@ -1307,7 +1305,7 @@ end
 function Biddikus:ProcessBid(player, playerNick, class, amount)
     if self:ValidateBid(amount) then
         r, g, b = GetClassColor(class)
-        self.frame.history:AddMessage(amount .. " - " .. playerNick, r, g, b)
+        self.frame.history:AddMessage(string.format("%.2f", amount) .. " - " .. playerNick, r, g, b)
         self.bid.currentBid = amount
         self.bid.currentPlayer = player
         self.bid.currentPlayerNick = playerNick
@@ -1357,7 +1355,7 @@ function Biddikus:SetupBid(item, minimum, timer)
         }
         self.frame.history:Clear()
         if Biddikus.frame.bidbox:GetNumber() < self.bid.minimum then
-            Biddikus.frame.bidbox:SetNumber(self.bid.minimum)
+            Biddikus.frame.bidbox:SetNumber(string.format("%.2f", self.bid.minimum))
         end
     end
 end
@@ -1375,7 +1373,7 @@ function Biddikus:EndBid(player, playerNick, class, amount)
         if self.bid.currentPlayer then
             self.frame.history:AddMessage("Sold! Congratulations " .. playerNick .. ".")
             if self:CheckIfMasterLooter() then
-                SendChatMessage("[Biddikus] " .. self.bid.item .. " sold to " .. player .. " for " .. amount .."dkp.  Congratulations!", "RAID")
+                SendChatMessage("[Biddikus] " .. self.bid.item .. " sold to " .. player .. " for " .. string.format("%.2f", amount) .."dkp.  Congratulations!", "RAID")
             end
         else
             self.frame.history:AddMessage(self.bid.item .. " is unwanted.  So sad..")

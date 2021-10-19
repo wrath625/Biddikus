@@ -556,6 +556,16 @@ LSM:Register("sound", "Priority2", [[Interface\AddOns\Biddikus\media\sound\prior
 LSM:Register("sound", "Priority3", [[Interface\AddOns\Biddikus\media\sound\priority3.ogg]])
 LSM:Register("sound", "Priority4", [[Interface\AddOns\Biddikus\media\sound\priority4.ogg]])
 LSM:Register("sound", "Priority5", [[Interface\AddOns\Biddikus\media\sound\priority5.ogg]])
+LSM:Register("sound", "Priority6", [[Interface\AddOns\Biddikus\media\sound\baneidontknowwhatthehellimdoing.ogg]])
+LSM:Register("sound", "Priority7", [[Interface\AddOns\Biddikus\media\sound\baneigotshitgoingonfuckoff.ogg]])
+LSM:Register("sound", "Priority8", [[Interface\AddOns\Biddikus\media\sound\bopme.ogg]])
+LSM:Register("sound", "Priority9", [[Interface\AddOns\Biddikus\media\sound\busyaxelyoudumdumhead.ogg]])
+LSM:Register("sound", "Priority10", [[Interface\AddOns\Biddikus\media\sound\limwearedoingfuckingdailies.ogg]])
+LSM:Register("sound", "Priority11", [[Interface\AddOns\Biddikus\media\sound\lispohgeeze.ogg]])
+LSM:Register("sound", "Priority12", [[Interface\AddOns\Biddikus\media\sound\xeliloveyouguys.ogg]])
+LSM:Register("sound", "Priority13", [[Interface\AddOns\Biddikus\media\sound\xelnicefuckingwork.ogg]])
+LSM:Register("sound", "Priority14", [[Interface\AddOns\Biddikus\media\sound\xelpoggers.ogg]])
+LSM:Register("sound", "Priority15", [[Interface\AddOns\Biddikus\media\sound\xelthepainbegingallovertomorrow.ogg]])
 LSM:Register("sound", "Reset", [[Interface\AddOns\Biddikus\media\sound\reset.ogg]])
 LSM:Register("sound", "Pause", [[Interface\AddOns\Biddikus\media\sound\pause.ogg]])
 LSM:Register("sound", "1", [[Interface\AddOns\Biddikus\media\sound\Kolt\1.ogg]])
@@ -1335,7 +1345,7 @@ end
 
 function Biddikus:SetupBid(item, minimum, timer)
     if item then
-        if C.sound.enable and C.sound.start then PlaySoundFile(LSM:Fetch("sound", "Priority" .. math.random(1,5)), "Master") end
+        if C.sound.enable and C.sound.start then PlaySoundFile(LSM:Fetch("sound", "Priority" .. math.random(1,15)), "Master") end
         if C.raidWarningStart then
             RaidNotice_AddMessage(RaidWarningFrame, "[Biddikus] " .. item .. " starting!", ChatTypeInfo["RAID_WARNING"]);
         end

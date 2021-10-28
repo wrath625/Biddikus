@@ -2,7 +2,7 @@
 ## Title: Biddikus
 ## Notes: This Addon bids items for use with a DKP system.
 ## Author: James "Gromph" Gardiner
-## Version: 1.02
+## Version: 1.12
 ## SavedVariables: BiddikusDB
 
 Biddikus.xml

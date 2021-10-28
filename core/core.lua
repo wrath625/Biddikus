@@ -556,16 +556,24 @@ LSM:Register("sound", "Priority2", [[Interface\AddOns\Biddikus\media\sound\prior
 LSM:Register("sound", "Priority3", [[Interface\AddOns\Biddikus\media\sound\priority3.ogg]])
 LSM:Register("sound", "Priority4", [[Interface\AddOns\Biddikus\media\sound\priority4.ogg]])
 LSM:Register("sound", "Priority5", [[Interface\AddOns\Biddikus\media\sound\priority5.ogg]])
-LSM:Register("sound", "Priority6", [[Interface\AddOns\Biddikus\media\sound\baneidontknowwhatthehellimdoing.ogg]])
-LSM:Register("sound", "Priority7", [[Interface\AddOns\Biddikus\media\sound\baneigotshitgoingonfuckoff.ogg]])
-LSM:Register("sound", "Priority8", [[Interface\AddOns\Biddikus\media\sound\bopme.ogg]])
-LSM:Register("sound", "Priority9", [[Interface\AddOns\Biddikus\media\sound\busyaxelyoudumdumhead.ogg]])
-LSM:Register("sound", "Priority10", [[Interface\AddOns\Biddikus\media\sound\limwearedoingfuckingdailies.ogg]])
-LSM:Register("sound", "Priority11", [[Interface\AddOns\Biddikus\media\sound\lispohgeeze.ogg]])
-LSM:Register("sound", "Priority12", [[Interface\AddOns\Biddikus\media\sound\xeliloveyouguys.ogg]])
-LSM:Register("sound", "Priority13", [[Interface\AddOns\Biddikus\media\sound\xelnicefuckingwork.ogg]])
-LSM:Register("sound", "Priority14", [[Interface\AddOns\Biddikus\media\sound\xelpoggers.ogg]])
-LSM:Register("sound", "Priority15", [[Interface\AddOns\Biddikus\media\sound\xelthepainbegingallovertomorrow.ogg]])
+LSM:Register("sound", "Priority6", [[Interface\AddOns\Biddikus\media\sound\bane1.ogg]])
+LSM:Register("sound", "Priority7", [[Interface\AddOns\Biddikus\media\sound\bane2.ogg]])
+LSM:Register("sound", "Priority8", [[Interface\AddOns\Biddikus\media\sound\bus1.ogg]])
+LSM:Register("sound", "Priority9", [[Interface\AddOns\Biddikus\media\sound\bus2.ogg]])
+LSM:Register("sound", "Priority10", [[Interface\AddOns\Biddikus\media\sound\dotskekw.ogg]])
+LSM:Register("sound", "Priority11", [[Interface\AddOns\Biddikus\media\sound\dotswood.ogg]])
+LSM:Register("sound", "Priority12", [[Interface\AddOns\Biddikus\media\sound\lim1.ogg]])
+LSM:Register("sound", "Priority13", [[Interface\AddOns\Biddikus\media\sound\lisp1.ogg]])
+LSM:Register("sound", "Priority14", [[Interface\AddOns\Biddikus\media\sound\tsbdotsdumb.ogg]])
+LSM:Register("sound", "Priority15", [[Interface\AddOns\Biddikus\media\sound\xel1.ogg]])
+LSM:Register("sound", "Priority16", [[Interface\AddOns\Biddikus\media\sound\xel2.ogg]])
+LSM:Register("sound", "Priority17", [[Interface\AddOns\Biddikus\media\sound\xel3.ogg]])
+LSM:Register("sound", "Priority18", [[Interface\AddOns\Biddikus\media\sound\xel4.ogg]])
+LSM:Register("sound", "Priority19", [[Interface\AddOns\Biddikus\media\sound\xelglaives.ogg]])
+LSM:Register("sound", "Priority20", [[Interface\AddOns\Biddikus\media\sound\xelgood.ogg]])
+LSM:Register("sound", "Priority21", [[Interface\AddOns\Biddikus\media\sound\xelmagfault.ogg]])
+LSM:Register("sound", "Priority22", [[Interface\AddOns\Biddikus\media\sound\xeltoken.ogg]])
+LSM:Register("sound", "Priority23", [[Interface\AddOns\Biddikus\media\sound\xeltsbbop.ogg]])
 LSM:Register("sound", "Reset", [[Interface\AddOns\Biddikus\media\sound\reset.ogg]])
 LSM:Register("sound", "Pause", [[Interface\AddOns\Biddikus\media\sound\pause.ogg]])
 LSM:Register("sound", "1", [[Interface\AddOns\Biddikus\media\sound\Kolt\1.ogg]])
@@ -1216,6 +1224,7 @@ function Biddikus:SendStartBid(item, minimum, timer)
             item = item,
             minimum = minimum,
             timer = timer,
+            rand = math.random(1,23)
         }
         self:SendComm(payload)
         SendChatMessage("[Biddikus] bid for " .. item .. " starting!", "RAID")
@@ -1272,7 +1281,7 @@ function Biddikus:OnCommReceived(prefix, message, distribution, sender)
             self:ProcessBid(payload.playerName, payload.playerNick, payload.playerClass, payload.bidAmount)
         end
         if payload.messageType == "START" then
-            self:SetupBid(payload.item, payload.minimum, payload.timer)
+            self:SetupBid(payload.item, payload.minimum, payload.timer, payload.rand)
         end
         if payload.messageType == "END" then
             self:EndBid(payload.playerName, payload.playerNick, payload.playerClass, payload.bidAmount)
@@ -1343,9 +1352,9 @@ function Biddikus:ValidateBid(amount)
     return false
 end
 
-function Biddikus:SetupBid(item, minimum, timer)
+function Biddikus:SetupBid(item, minimum, timer, rand)
     if item then
-        if C.sound.enable and C.sound.start then PlaySoundFile(LSM:Fetch("sound", "Priority" .. math.random(1,15)), "Master") end
+        if C.sound.enable and C.sound.start then PlaySoundFile(LSM:Fetch("sound", "Priority" .. rand), "Master") end
         if C.raidWarningStart then
             RaidNotice_AddMessage(RaidWarningFrame, "[Biddikus] " .. item .. " starting!", ChatTypeInfo["RAID_WARNING"]);
         end

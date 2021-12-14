@@ -583,7 +583,7 @@ LSM:Register("sound", "Priority29", [[Interface\AddOns\Biddikus\media\sound\dots
 LSM:Register("sound", "Priority30", [[Interface\AddOns\Biddikus\media\sound\tsbyikes.ogg]])
 LSM:Register("sound", "Priority31", [[Interface\AddOns\Biddikus\media\sound\xelsquawk.ogg]])
 LSM:Register("sound", "Priority32", [[Interface\AddOns\Biddikus\media\sound\xelthesimp.ogg]])
-LSM:Register("sound", "Priority33", [[Interface\AddOns\Biddikus\media\sound\xelwelldonehealies.ogg]])
+LSM:Register("sound", "Priority33", [[Interface\AddOns\Biddikus\media\sound\xelwelldone.ogg]])
 LSM:Register("sound", "Priority34", [[Interface\AddOns\Biddikus\media\sound\casstoken.ogg]])
 LSM:Register("sound", "Reset", [[Interface\AddOns\Biddikus\media\sound\reset.ogg]])
 LSM:Register("sound", "Pause", [[Interface\AddOns\Biddikus\media\sound\pause.ogg]])

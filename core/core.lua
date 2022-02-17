@@ -551,11 +551,11 @@ Biddikus.defaultOptions = {
 
 local LSM = LibStub("LibSharedMedia-3.0")
 -- Register some media
-LSM:Register("sound", "Priority1", [[Interface\AddOns\Biddikus\media\sound\priority1.ogg]])
-LSM:Register("sound", "Priority2", [[Interface\AddOns\Biddikus\media\sound\priority2.ogg]])
-LSM:Register("sound", "Priority3", [[Interface\AddOns\Biddikus\media\sound\priority3.ogg]])
-LSM:Register("sound", "Priority4", [[Interface\AddOns\Biddikus\media\sound\priority4.ogg]])
-LSM:Register("sound", "Priority5", [[Interface\AddOns\Biddikus\media\sound\priority5.ogg]])
+LSM:Register("sound", "Priority1", [[Interface\AddOns\Biddikus\media\sound\fgandi.ogg]])
+LSM:Register("sound", "Priority2", [[Interface\AddOns\Biddikus\media\sound\xelaxus.ogg]])
+LSM:Register("sound", "Priority3", [[Interface\AddOns\Biddikus\media\sound\limlife.ogg]])
+LSM:Register("sound", "Priority4", [[Interface\AddOns\Biddikus\media\sound\limtotem.ogg]])
+LSM:Register("sound", "Priority5", [[Interface\AddOns\Biddikus\media\sound\limtank.ogg]])
 LSM:Register("sound", "Priority6", [[Interface\AddOns\Biddikus\media\sound\bane1.ogg]])
 LSM:Register("sound", "Priority7", [[Interface\AddOns\Biddikus\media\sound\bane2.ogg]])
 LSM:Register("sound", "Priority8", [[Interface\AddOns\Biddikus\media\sound\bus1.ogg]])
@@ -571,11 +571,11 @@ LSM:Register("sound", "Priority17", [[Interface\AddOns\Biddikus\media\sound\xel3
 LSM:Register("sound", "Priority18", [[Interface\AddOns\Biddikus\media\sound\xel4.ogg]])
 LSM:Register("sound", "Priority19", [[Interface\AddOns\Biddikus\media\sound\xelglaives.ogg]])
 LSM:Register("sound", "Priority20", [[Interface\AddOns\Biddikus\media\sound\xelgood.ogg]])
-LSM:Register("sound", "Priority21", [[Interface\AddOns\Biddikus\media\sound\xelmagfault.ogg]])
+LSM:Register("sound", "Priority21", [[Interface\AddOns\Biddikus\media\sound\xelpoultry.ogg]])
 LSM:Register("sound", "Priority22", [[Interface\AddOns\Biddikus\media\sound\xeltoken.ogg]])
 LSM:Register("sound", "Priority23", [[Interface\AddOns\Biddikus\media\sound\xeltsbbop.ogg]])
 LSM:Register("sound", "Priority24", [[Interface\AddOns\Biddikus\media\sound\casstupidgame.ogg]])
-LSM:Register("sound", "Priority25", [[Interface\AddOns\Biddikus\media\sound\limstand.ogg]])
+LSM:Register("sound", "Priority25", [[Interface\AddOns\Biddikus\media\sound\limpull.ogg]])
 LSM:Register("sound", "Priority26", [[Interface\AddOns\Biddikus\media\sound\tsbbop2.ogg]])
 LSM:Register("sound", "Priority27", [[Interface\AddOns\Biddikus\media\sound\xelbeaten.ogg]])
 LSM:Register("sound", "Priority28", [[Interface\AddOns\Biddikus\media\sound\xelchicken.ogg]])
@@ -585,6 +585,8 @@ LSM:Register("sound", "Priority31", [[Interface\AddOns\Biddikus\media\sound\xels
 LSM:Register("sound", "Priority32", [[Interface\AddOns\Biddikus\media\sound\xelthesimp.ogg]])
 LSM:Register("sound", "Priority33", [[Interface\AddOns\Biddikus\media\sound\xelwelldone.ogg]])
 LSM:Register("sound", "Priority34", [[Interface\AddOns\Biddikus\media\sound\casstoken.ogg]])
+LSM:Register("sound", "Priority35", [[Interface\AddOns\Biddikus\media\sound\beanattention.ogg]])
+LSM:Register("sound", "Priority36", [[Interface\AddOns\Biddikus\media\sound\beanhate.ogg]])
 LSM:Register("sound", "Reset", [[Interface\AddOns\Biddikus\media\sound\reset.ogg]])
 LSM:Register("sound", "Pause", [[Interface\AddOns\Biddikus\media\sound\pause.ogg]])
 LSM:Register("sound", "1", [[Interface\AddOns\Biddikus\media\sound\Kolt\1.ogg]])
@@ -1235,7 +1237,7 @@ function Biddikus:SendStartBid(item, minimum, timer)
             item = item,
             minimum = minimum,
             timer = timer,
-            rand = math.random(1,34)
+            rand = math.random(1,36)
         }
         self:SendComm(payload)
         SendChatMessage("[Biddikus] bid for " .. item .. " starting!", "RAID")

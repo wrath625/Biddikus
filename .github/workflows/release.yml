@@ -9,17 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Increment Step Patch
-      id: increment-semver-patch
-      uses: Benbentwo/increment-semver@master
-      with:
-        version-level: '-p'
-
     - name: Archive Release
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        filename: 'Biddikus-v${{ steps.increment-semver-patch.outputs.version }}-bc.zip'
+        filename: 'Biddikus-${{ github.ref }}-bc.zip'
         exclusions: '*.git* /*node_modules/* .editorconfig'
 
     - name: Create Release
@@ -28,8 +22,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
-        tag_name: v${{ steps.increment-semver-patch.outputs.version }}
-        release_name: Release v${{ steps.increment-semver-patch.outputs.version }}
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
         body: New Release
         draft: false
         prerelease: false
@@ -41,15 +35,15 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./Biddikus-v${{ steps.increment-semver-patch.outputs.version }}-bc.zip
-        asset_name: Biddikus-v${{ steps.increment-semver-patch.outputs.version }}-bc.zip
+        asset_path: ./Biddikus-${{ github.ref }}-bc.zip
+        asset_name: Biddikus-${{ github.ref }}-bc.zip
         asset_content_type: application/zip
 
     - name: "Upload to CurseForge"
       uses: itsmeow/curseforge-upload@v3
       with:
-        file_path: 'Biddikus-v${{ steps.increment-semver-patch.outputs.version }}-bc.zip'
+        file_path: ./Biddikus-${{ github.ref }}-bc.zip
         game_endpoint: "wow"
-        game_versions: "WoW Burning Crusade Classic 2.5.3"
+        game_versions: "2.5.3"
         project_id: "431371"
         token: "${{ secrets.CF_API_TOKEN }}"

@@ -12,7 +12,7 @@ jobs:
     - name: Install Zip
       uses: montudor/action-zip@v1
     - name: Archive Release
-      run: zip -r Biddikus-${{ github.ref_name }}-bc.zip biddikus -x *.git*
+      run: zip -r Biddikus-${{ github.ref_name }}-bc.zip Biddikus -x *.git*
       working-directory: ..
 
     - name: Create Release

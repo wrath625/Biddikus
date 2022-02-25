@@ -13,7 +13,7 @@ jobs:
       uses: thedoctor0/zip-release@master
       with:
         type: 'zip'
-        filename: 'Biddikus-${{ github.ref }}-bc.zip'
+        filename: 'Biddikus-${{ github.ref_name }}-bc.zip'
         exclusions: '*.git* /*node_modules/* .editorconfig'
 
     - name: Create Release
@@ -22,8 +22,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
         body: New Release
         draft: false
         prerelease: false
@@ -35,14 +35,14 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./Biddikus-${{ github.ref }}-bc.zip
-        asset_name: Biddikus-${{ github.ref }}-bc.zip
+        asset_path: ./Biddikus-${{ github.ref_name }}-bc.zip
+        asset_name: Biddikus-${{ github.ref_name }}-bc.zip
         asset_content_type: application/zip
 
     - name: "Upload to CurseForge"
       uses: itsmeow/curseforge-upload@v3
       with:
-        file_path: ./Biddikus-${{ github.ref }}-bc.zip
+        file_path: ./Biddikus-${{ github.ref_name }}-bc.zip
         game_endpoint: "wow"
         game_versions: "2.5.3"
         project_id: "431371"

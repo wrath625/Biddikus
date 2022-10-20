@@ -12,7 +12,7 @@ jobs:
     - name: Install Zip
       uses: montudor/action-zip@v1
     - name: Archive Release
-      run: zip -r Biddikus-${{ github.ref_name }}-bc.zip Biddikus -x *.git*
+      run: zip -r Biddikus-${{ github.ref_name }}-wrath.zip Biddikus -x *.git*
       working-directory: ..
 
     - name: Create Release
@@ -34,14 +34,14 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ../Biddikus-${{ github.ref_name }}-bc.zip
-        asset_name: Biddikus-${{ github.ref_name }}-bc.zip
+        asset_path: ../Biddikus-${{ github.ref_name }}-wrath.zip
+        asset_name: Biddikus-${{ github.ref_name }}-wrath.zip
         asset_content_type: application/zip
 
     - name: "Upload to CurseForge"
       uses: itsmeow/curseforge-upload@v3
       with:
-        file_path: ../Biddikus-${{ github.ref_name }}-bc.zip
+        file_path: ../Biddikus-${{ github.ref_name }}-wrath.zip
         game_endpoint: "wow"
         game_versions: "2.5.3"
         project_id: "431371"

@@ -43,6 +43,6 @@ jobs:
       with:
         file_path: ../Biddikus-${{ github.ref_name }}-wrath.zip
         game_endpoint: "wow"
-        game_versions: "2.5.3"
+        game_versions: "3.4.0"
         project_id: "431371"
         token: "${{ secrets.CF_API_TOKEN }}"

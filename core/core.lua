@@ -1436,7 +1436,7 @@ function Biddikus:EndBid(player, playerNick, class, amount)
                 SendChatMessage("[Biddikus] " .. self.bid.item .. " sold to " .. player .. " for " .. string.format("%.2f", amount) .."dkp.  Congratulations!", "RAID")
                 local itemName, itemLink, itemQual = GetItemInfo(Biddikus.item)
 
-                self.frame.footer.cp.copybox:SetText(itemName .. "|" .. playerNick .. "|" .. string.format("%.2f", amount))
+                self.frame.footer.cp.copybox:SetText(itemName .. "$" .. playerNick .. "$" .. string.format("%.2f", amount))
             end
         else
             self.frame.history:AddMessage(self.bid.item .. " is unwanted.  So sad..")
